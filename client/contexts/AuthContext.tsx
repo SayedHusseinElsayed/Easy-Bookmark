@@ -98,13 +98,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           window.history.replaceState({}, "", clean);
 
           // Redirect after success (adjust to your app)
-          if (type === "recovery") {
-            // If you're doing a password reset flow, send them to a reset page you handle
-            window.location.replace("/reset-password");
-          } else {
-            // Default after email verification
-            window.location.replace("/dashboard");
-          }
+// Redirect after success (adjust to your app)
+if (type === "recovery") {
+  window.location.replace("/reset-password");
+} else {
+  // Stay on /auth/callback so AuthCallback.tsx can show the success page
+  window.history.replaceState({}, "", "/auth/callback");
+}
+
         })
         .catch((e) => console.error("setSession exception:", e));
     }
