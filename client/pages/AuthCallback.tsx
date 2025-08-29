@@ -11,7 +11,8 @@ export default function AuthCallback() {
   useEffect(() => {
     if (session) {
       const timer = setTimeout(() => {
-        navigate('/dashboard')
+        // 👇 Change this to your actual landing page
+        navigate('/')
       }, 3000) // Redirect after 3 seconds
       return () => clearTimeout(timer)
     }
@@ -27,10 +28,11 @@ export default function AuthCallback() {
         </CardHeader>
         <CardContent>
           <p className="text-gray-600 mb-6">
-            Thank you for confirming your email address. You will be redirected to the dashboard shortly.
+            Thank you for confirming your email address. You will be redirected shortly.
           </p>
           <Button asChild>
-            <Link to="/dashboard">Go to Dashboard</Link>
+            {/* 👇 Update the button link as well */}
+            <Link to="/">Go to Home</Link>
           </Button>
         </CardContent>
       </Card>
