@@ -309,7 +309,7 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners }
             <CardTitle className="text-base">{folder.name}</CardTitle>
           </div>
           
-          <div className="flex items-center space-x-1">
+                    <div className="flex flex-col items-center space-y-1">
             <Button
               size="sm"
               variant="ghost"
@@ -352,7 +352,7 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners }
               </DialogContent>
             </Dialog>
 
-                        <div className="flex flex-col items-center space-y-1">
+            <div className="flex flex-col items-center space-y-1">
               <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onShare(folder)}>
                 <Share className="h-4 w-4" />
               </Button>
