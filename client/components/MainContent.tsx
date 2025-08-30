@@ -295,78 +295,71 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners }
   }
 
   return (
-    <Card className="h-fit shadow-soft hover:shadow-medium transition-all duration-200 animate-fade-in group">
+    <Card className="h-fit shadow-soft hover:shadow-medium transition-all duration-200 animate-fade-in group relative">
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
-              <GripVertical className="h-4 w-4 text-gray-400" />
-            </div>
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: folder.color }}
-            />
-            <CardTitle className="text-base">{folder.name}</CardTitle>
-          </div>
-          
-                    <div className="flex flex-col items-center space-y-1">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={addCurrentTabs}
-              className="h-6 px-2 text-xs"
-            >
-              Add URLs
-            </Button>
-            
-            <Dialog open={showAddLinkDialog} onOpenChange={setShowAddLinkDialog}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Link</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={createLink} className="space-y-4">
-                  <div>
-                    <Label htmlFor="title">Title</Label>
-                    <Input id="title" name="title" placeholder="Enter link title" required />
-                  </div>
-                  <div>
-                    <Label htmlFor="url">URL</Label>
-                    <Input id="url" name="url" type="url" placeholder="https://example.com" required />
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Description (optional)</Label>
-                    <Input id="description" name="description" placeholder="Enter description" />
-                  </div>
-                  <div className="flex justify-end space-x-2">
-                    <Button type="button" variant="outline" onClick={() => setShowAddLinkDialog(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit">Add Link</Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
-
-            <div className="flex flex-col items-center space-y-1">
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onShare(folder)}>
-                <Share className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onEdit(folder)}>
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onDelete(folder.id)}>
-                <Trash2 className="h-4 w-4 text-red-600" />
-              </Button>
-            </div>
-          </div>
+        <div className="flex items-center justify-center">
+          <div
+            className="w-3 h-3 rounded-full mr-2"
+            style={{ backgroundColor: folder.color }}
+          />
+          <CardTitle className="text-base text-center">{folder.name}</CardTitle>
         </div>
       </CardHeader>
       
+      <div className="absolute top-2 right-2 flex flex-col items-center space-y-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={addCurrentTabs}
+          className="h-6 px-2 text-xs"
+        >
+          Add URLs
+        </Button>
+        
+        <Dialog open={showAddLinkDialog} onOpenChange={setShowAddLinkDialog}>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+              <Plus className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Link</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={createLink} className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title</Label>
+                <Input id="title" name="title" placeholder="Enter link title" required />
+              </div>
+              <div>
+                <Label htmlFor="url">URL</Label>
+                <Input id="url" name="url" type="url" placeholder="https://example.com" required />
+              </div>
+              <div>
+                <Label htmlFor="description">Description (optional)</Label>
+                <Input id="description" name="description" placeholder="Enter description" />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setShowAddLinkDialog(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">Add Link</Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onShare(folder)}>
+          <Share className="h-4 w-4" />
+        </Button>
+        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onEdit(folder)}>
+          <Edit className="h-4 w-4" />
+        </Button>
+        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onDelete(folder.id)}>
+          <Trash2 className="h-4 w-4 text-red-600" />
+        </Button>
+      </div>
+
       <CardContent className="pt-0">
         <div className="space-y-2">
           {links.map(link => (
