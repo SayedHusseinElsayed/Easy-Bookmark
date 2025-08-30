@@ -352,7 +352,7 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners }
               </DialogContent>
             </Dialog>
 
-            <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex flex-col items-center space-y-1">
               <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onShare(folder)}>
                 <Share className="h-4 w-4" />
               </Button>
