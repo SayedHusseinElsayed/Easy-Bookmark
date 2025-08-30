@@ -38,7 +38,7 @@ export default function Dashboard() {
     }
 
     try {
-      const response = await fetch('/api/easy bookmarks/export', {
+      const response = await fetch('/api/bookmarks/export', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
@@ -52,7 +52,7 @@ export default function Dashboard() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'easy bookmarks-backup.json';
+      a.download = 'easy-bookmarks-backup.json';
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -83,15 +83,15 @@ export default function Dashboard() {
         if (typeof content !== 'string') {
           throw new Error('Failed to read file content.');
         }
-        const easy bookmarks = JSON.parse(content);
+        const easyBookmarks = JSON.parse(content);
 
-        const response = await fetch('/api/easy bookmarks/import', {
+        const response = await fetch('/api/bookmarks/import', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify(easy bookmarks),
+          body: JSON.stringify(easyBookmarks),
         });
 
         if (!response.ok) {
