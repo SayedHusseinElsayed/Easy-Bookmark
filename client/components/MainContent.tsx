@@ -297,16 +297,16 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners }
   return (
     <Card className="h-fit shadow-soft hover:shadow-medium transition-all duration-200 animate-fade-in group relative">
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-center">
+        <div className="flex items-center">
           <div
             className="w-3 h-3 rounded-full mr-2"
             style={{ backgroundColor: folder.color }}
           />
-          <CardTitle className="text-base text-center">{folder.name}</CardTitle>
+          <CardTitle className="text-base">{folder.name}</CardTitle>
         </div>
       </CardHeader>
       
-      <div className="absolute top-2 right-2 flex flex-col items-center space-y-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-2 right-2 flex flex-col items-center space-y-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white p-1 rounded-md shadow-md z-10">
         <Button
           size="sm"
           variant="ghost"
