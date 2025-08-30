@@ -148,9 +148,9 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-900">BookmarkHub</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-900">Easy Bookmark</CardTitle>
           <CardDescription>
-            Organize your bookmarks with ease
+            Organize your easy bookmarks with ease
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -761,7 +761,7 @@ export default function MainContent({ selectedBoard }: MainContentProps) {
               <FolderPlus className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">No folders yet</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Create your first folder to organize your bookmarks.
+                Create your first folder to organize your easy bookmarks.
               </p>
               <Button 
                 className="mt-4"

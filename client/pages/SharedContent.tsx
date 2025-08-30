@@ -222,14 +222,14 @@ export default function SharedContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">BH</span>
+              <span className="text-white font-bold text-sm">EB</span>
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
                 {'name' in resource ? resource.name : resource.title}
               </h1>
               <p className="text-sm text-gray-500">
-                Shared {resourceType} from BookmarkHub
+                Shared {resourceType} from Easy Bookmark
               </p>
             </div>
           </div>
@@ -341,7 +341,7 @@ export default function SharedContent() {
               href="/"
               className="font-medium text-blue-600 hover:text-blue-500"
             >
-              BookmarkHub
+              Easy Bookmark
             </a>
           </p>
         </div>

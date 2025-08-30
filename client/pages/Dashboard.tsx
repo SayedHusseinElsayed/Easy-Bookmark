@@ -33,31 +33,31 @@ export default function Dashboard() {
 
   const handleExport = async () => {
     if (!session) {
-      toast({ title: 'Authentication Error', description: 'You must be logged in to export bookmarks.' });
+      toast({ title: 'Authentication Error', description: 'You must be logged in to export easy bookmarks.' });
       return;
     }
 
     try {
-      const response = await fetch('/api/bookmarks/export', {
+      const response = await fetch('/api/easy bookmarks/export', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to export bookmarks.');
+        throw new Error('Failed to export easy bookmarks.');
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'bookmarks-backup.json';
+      a.download = 'easy bookmarks-backup.json';
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-      toast({ title: 'Export Successful', description: 'Your bookmarks have been downloaded.' });
+      toast({ title: 'Export Successful', description: 'Your easy bookmarks have been downloaded.' });
     } catch (error) {
       toast({ title: 'Export Failed', description: (error as Error).message, variant: 'destructive' });
     }
@@ -72,7 +72,7 @@ export default function Dashboard() {
     if (!file) return;
 
     if (!session) {
-      toast({ title: 'Authentication Error', description: 'You must be logged in to import bookmarks.' });
+      toast({ title: 'Authentication Error', description: 'You must be logged in to import easy bookmarks.' });
       return;
     }
 
@@ -83,24 +83,24 @@ export default function Dashboard() {
         if (typeof content !== 'string') {
           throw new Error('Failed to read file content.');
         }
-        const bookmarks = JSON.parse(content);
+        const easy bookmarks = JSON.parse(content);
 
-        const response = await fetch('/api/bookmarks/import', {
+        const response = await fetch('/api/easy bookmarks/import', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify(bookmarks),
+          body: JSON.stringify(easy bookmarks),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to import bookmarks.');
+          throw new Error(errorData.error || 'Failed to import easy bookmarks.');
         }
 
         toast({ title: 'Import Successful', description: 'Bookmarks have been imported. Refreshing...' });
-        // Reload to see the new bookmarks
+        // Reload to see the new easy bookmarks
         setTimeout(() => {
           window.location.reload();
         }, 1500);
@@ -139,9 +139,9 @@ export default function Dashboard() {
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-soft">
-              <span className="text-white font-bold text-sm">BH</span>
+              <span className="text-white font-bold text-sm">EB</span>
             </div>
-            <h1 className="text-xl font-bold text-gray-900">BookmarkHub</h1>
+            <h1 className="text-xl font-bold text-gray-900">Easy Bookmark</h1>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -206,9 +206,9 @@ export default function Dashboard() {
 
           <div className="flex items-center space-x-2">
             <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-xs">BH</span>
+              <span className="text-white font-bold text-xs">EB</span>
             </div>
-            <span className="font-semibold text-gray-900">BookmarkHub</span>
+            <span className="font-semibold text-gray-900">Easy Bookmark</span>
           </div>
         </div>
 
