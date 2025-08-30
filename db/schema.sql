@@ -1,33 +1,42 @@
--- Function to delete user from auth.users and all their data
-create or replace function delete_auth_user()
-returns trigger
-language plpgsql
-security definer
-as $$
-begin
-  -- Delete share links associated with the user's boards, folders, and links
-  delete from public.share_links where resource_id in (select id from public.boards where user_id = old.id);
-  delete from public.share_links where resource_id in (select id from public.folders where board_id in (select id from public.boards where user_id = old.id));
-  delete from public.share_links where resource_id in (select id from public.links where folder_id in (select id from public.folders where board_id in (select id from public.boards where user_id = old.id)));
 
-  -- Delete links
-  delete from public.links where folder_id in (select id from public.folders where board_id in (select id from public.boards where user_id = old.id));
+-- Add slug column to boards table
+ALTER TABLE public.boards ADD COLUMN slug text;
 
-  -- Delete folders
-  delete from public.folders where board_id in (select id from public.boards where user_id = old.id);
-
-  -- Delete boards
-  delete from public.boards where user_id = old.id;
-
-  -- Delete user from auth.users
-  delete from auth.users where id = old.id;
-  
-  return old;
-end;
+-- Function to generate a slug
+CREATE OR REPLACE FUNCTION public.generate_slug(text)
+RETURNS text
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  slug text;
+BEGIN
+  -- Convert to lowercase
+  slug := lower($1);
+  -- Replace non-alphanumeric characters with hyphens
+  slug := regexp_replace(slug, '[^a-z0-9]+', '-', 'g');
+  -- Remove leading/trailing hyphens
+  slug := trim(both '-' from slug);
+  -- Handle empty slug
+  IF slug = '' THEN
+    slug := 'board';
+  END IF;
+  -- Ensure uniqueness
+  RETURN (SELECT CASE WHEN count(*) = 0 THEN slug ELSE slug || '-' || substr(md5(random()::text), 1, 4) END FROM public.boards WHERE public.boards.slug = slug);
+END;
 $$;
 
--- Trigger to call the function when a user is deleted
-create or replace trigger on_public_user_deleted
-  after delete on public.users
-  for each row
-  execute procedure delete_auth_user();
+-- Trigger to set slug on insert/update of boards
+CREATE OR REPLACE FUNCTION public.set_board_slug()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.slug := public.generate_slug(NEW.name);
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER set_board_slug_trigger
+BEFORE INSERT OR UPDATE OF name ON public.boards
+FOR EACH ROW
+EXECUTE FUNCTION public.set_board_slug();

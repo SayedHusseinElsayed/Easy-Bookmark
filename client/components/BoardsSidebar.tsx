@@ -1,48 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Board, supabase } from '@/lib/supabase'
-import { useAuth } from '@/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Plus, MoreHorizontal, Edit, Trash2, Share, GripVertical } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import ShareDialog from '@/components/ShareDialog'
-
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  arrayMove,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-
 interface BoardsSidebarProps {
   selectedBoard: Board | null
   onBoardSelect: (board: Board) => void
-  selectedBoardId?: string
+  selectedBoardSlug?: string // Changed from selectedBoardId
 }
 
 interface SortableBoardItemProps {
@@ -115,7 +74,7 @@ function SortableBoardItem({ board, isSelected, onSelect, onEdit, onDelete, onSh
   )
 }
 
-export default function BoardsSidebar({ selectedBoard, onBoardSelect, selectedBoardId }: BoardsSidebarProps) {
+export default function BoardsSidebar({ selectedBoard, onBoardSelect, selectedBoardSlug }: BoardsSidebarProps) { // Changed selectedBoardId
   const { user } = useAuth()
   const navigate = useNavigate()
   const [boards, setBoards] = useState<Board[]>([])
@@ -135,7 +94,7 @@ export default function BoardsSidebar({ selectedBoard, onBoardSelect, selectedBo
 
   useEffect(() => {
     fetchBoards()
-  }, [user])
+  }, [user, selectedBoardSlug]) // Added selectedBoardSlug to dependencies
 
   const fetchBoards = async () => {
     if (!user) return
@@ -150,14 +109,20 @@ export default function BoardsSidebar({ selectedBoard, onBoardSelect, selectedBo
       if (error) throw error
       setBoards(data || [])
       
-      // Auto-select first board if none selected
-      if (data && data.length > 0 && !selectedBoard && !selectedBoardId) {
-        onBoardSelect(data[0])
-        navigate(`/board/${data[0].id}`)
-      } else if (selectedBoardId && data) {
-        const board = data.find(b => b.id === selectedBoardId)
-        if (board) {
-          onBoardSelect(board)
+      // Auto-select first board if none selected or select by slug
+      if (data && data.length > 0 && !selectedBoard) {
+        if (selectedBoardSlug) {
+          const board = data.find(b => b.slug === selectedBoardSlug) // Find by slug
+          if (board) {
+            onBoardSelect(board)
+          } else {
+            // If slug not found, navigate to first board
+            onBoardSelect(data[0])
+            navigate(`/board/${data[0].slug}`)
+          }
+        } else {
+          onBoardSelect(data[0])
+          navigate(`/board/${data[0].slug}`)
         }
       }
     } catch (error) {
@@ -194,7 +159,7 @@ export default function BoardsSidebar({ selectedBoard, onBoardSelect, selectedBo
       setBoards([...boards, data])
       setShowCreateDialog(false)
       onBoardSelect(data)
-      navigate(`/board/${data.id}`)
+      navigate(`/board/${data.slug}`)
     } catch (error) {
       console.error('Error creating board:', error)
     }
@@ -244,7 +209,7 @@ export default function BoardsSidebar({ selectedBoard, onBoardSelect, selectedBo
       if (selectedBoard?.id === boardId) {
         if (updatedBoards.length > 0) {
           onBoardSelect(updatedBoards[0])
-          navigate(`/board/${updatedBoards[0].id}`)
+          navigate(`/board/${updatedBoards[0].slug}`)
         } else {
           navigate('/')
         }
@@ -373,7 +338,7 @@ export default function BoardsSidebar({ selectedBoard, onBoardSelect, selectedBo
                 isSelected={selectedBoard?.id === board.id}
                 onSelect={() => {
                   onBoardSelect(board)
-                  navigate(`/board/${board.id}`)
+                  navigate(`/board/${board.slug}`)
                 }}
                 onEdit={setEditingBoard}
                 onDelete={deleteBoard}

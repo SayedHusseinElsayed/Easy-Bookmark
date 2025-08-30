@@ -22,7 +22,7 @@ function App() {
             }
           />
           <Route
-            path="/board/:boardId"
+            path="/board/:boardSlug"
             element={
               <ProtectedRoute>
                 <Dashboard />

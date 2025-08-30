@@ -16,12 +16,58 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 
 export default function Dashboard() {
-  const { boardId } = useParams();
+  import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Board } from '@/lib/supabase';
+import BoardsSidebar from '@/components/BoardsSidebar';
+import MainContent from '@/components/MainContent';
+import { Button } from '@/components/ui/button';
+import { LogOut, User, Menu, X, FileUp, FileDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/components/ui/use-toast';
+
+export default function Dashboard() {
+  const { boardSlug } = useParams(); // Changed from boardId
   const { user, session, signOut } = useAuth();
   const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch board by slug
+  useEffect(() => {
+    const fetchBoardBySlug = async () => {
+      if (!boardSlug || !session) {
+        setSelectedBoard(null);
+        return;
+      }
+      try {
+        const response = await fetch(`/api/boards/${boardSlug}`, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch board by slug');
+        }
+        const data = await response.json();
+        setSelectedBoard(data);
+      } catch (error: any) {
+        console.error('Error fetching board by slug:', error);
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        setSelectedBoard(null);
+      }
+    };
+
+    fetchBoardBySlug();
+  }, [boardSlug, session, toast]); // Re-fetch when slug or session changes
 
   const handleBoardSelect = (board: Board) => {
     setSelectedBoard(board);
@@ -187,7 +233,7 @@ export default function Dashboard() {
         <BoardsSidebar 
           selectedBoard={selectedBoard} 
           onBoardSelect={handleBoardSelect}
-          selectedBoardId={boardId}
+          selectedBoardSlug={boardSlug} // Changed from selectedBoardId
         />
       </div>
 
@@ -215,5 +261,6 @@ export default function Dashboard() {
         <MainContent selectedBoard={selectedBoard} />
       </div>
     </div>
-  )
+  );
 }
+
