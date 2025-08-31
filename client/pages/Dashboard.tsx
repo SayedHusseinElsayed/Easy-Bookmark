@@ -6,6 +6,7 @@ import BoardsSidebar from '@/components/BoardsSidebar';
 import MainContent from '@/components/MainContent';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Menu, X, FileUp, FileDown } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +17,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 
 export default function Dashboard() {
-  import React, { useState, useRef, useEffect } from 'react';
+
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Board } from '@/lib/supabase';
