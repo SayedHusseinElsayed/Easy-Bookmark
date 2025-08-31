@@ -25,6 +25,3 @@ dist-ssr
 
 .config/
 !.env
-
-# Local Netlify folder
-.netlify
