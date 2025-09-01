@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Plus, MoreHorizontal, Edit, Trash2, Share, GripVertical, Search } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, slugify } from '@/lib/utils'
 import ShareDialog from '@/components/ShareDialog'
 
 import {
@@ -42,7 +42,7 @@ import { CSS } from '@dnd-kit/utilities'
 interface BoardsSidebarProps {
   selectedBoard: Board | null
   onBoardSelect: (board: Board) => void
-  selectedBoardId?: string
+  selectedBoardSlug?: string
   searchQuery: string
   setSearchQuery: (query: string) => void
 }
@@ -120,7 +120,7 @@ function SortableBoardItem({ board, isSelected, onSelect, onEdit, onDelete, onSh
 export default function BoardsSidebar({
   selectedBoard,
   onBoardSelect,
-  selectedBoardId,
+  selectedBoardSlug,
   searchQuery,
   setSearchQuery,
 }: BoardsSidebarProps) {
@@ -182,11 +182,11 @@ export default function BoardsSidebar({
       }
       
       // Auto-select first board if none selected
-      if (boardsData && boardsData.length > 0 && !selectedBoard && !selectedBoardId) {
+      if (boardsData && boardsData.length > 0 && !selectedBoard && !selectedBoardSlug) {
         onBoardSelect(boardsData[0])
-        navigate(`/board/${boardsData[0].id}`)
-      } else if (selectedBoardId && boardsData) {
-        const board = boardsData.find((b) => b.id === selectedBoardId)
+        navigate(`/board/${slugify(boardsData[0].name)}`)
+      } else if (selectedBoardSlug && boardsData) {
+        const board = boardsData.find((b) => slugify(b.name) === selectedBoardSlug)
         if (board) {
           onBoardSelect(board)
         }
@@ -432,7 +432,7 @@ export default function BoardsSidebar({
                 isSelected={selectedBoard?.id === board.id}
                 onSelect={() => {
                   onBoardSelect(board)
-                  navigate(`/board/${board.id}`)
+                  navigate(`/board/${slugify(board.name)}`)
                 }}
                 onEdit={setEditingBoard}
                 onDelete={deleteBoard}

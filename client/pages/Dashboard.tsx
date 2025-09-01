@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function Dashboard(): JSX.Element {
-  const { boardId } = useParams<{ boardId: string }>();
+  const { boardSlug } = useParams<{ boardSlug: string }>();
   const { user, session, signOut } = useAuth();
   const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -143,7 +143,7 @@ export default function Dashboard(): JSX.Element {
         <BoardsSidebar
           selectedBoard={selectedBoard}
           onBoardSelect={handleBoardSelect}
-          selectedBoardId={boardId}
+          selectedBoardSlug={boardSlug}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
         />
