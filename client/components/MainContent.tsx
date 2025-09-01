@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Board, Folder, Link, supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -47,6 +47,7 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { fetchTitle } from '@/lib/link-utils'
 
 interface MainContentProps {
   selectedBoard: Board | null
@@ -174,6 +175,7 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
   const [showAddLinkDialog, setShowAddLinkDialog] = useState(false)
   const [editingLink, setEditingLink] = useState<Link | null>(null)
   const [linkShareDialog, setLinkShareDialog] = useState<{ open: boolean; link: Link | null }>({ open: false, link: null })
+  const [linkTitle, setLinkTitle] = useState('');
 
   const isMatch = useMemo(() => {
     if (!searchQuery) return false
@@ -201,13 +203,24 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
     }
   }
 
+  const handleUrlPaste = async (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedUrl = e.clipboardData.getData('text');
+    if (pastedUrl) {
+      const title = await fetchTitle(pastedUrl);
+      setLinkTitle(title);
+    }
+  };
+
   const createLink = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    
     const formData = new FormData(e.currentTarget)
-    const title = formData.get('title') as string
     const url = formData.get('url') as string
     const description = formData.get('description') as string
+    let title = linkTitle;
+
+    if (!title) {
+      title = await fetchTitle(url)
+    }
 
     try {
       const { data, error } = await supabase
@@ -228,6 +241,7 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
       
       setLinks([...links, data])
       setShowAddLinkDialog(false)
+      setLinkTitle('')
     } catch (error) {
       console.error('Error creating link:', error)
     }
@@ -341,7 +355,12 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
               Add URLs
             </Button>
             
-            <Dialog open={showAddLinkDialog} onOpenChange={setShowAddLinkDialog}>
+            <Dialog open={showAddLinkDialog} onOpenChange={(isOpen) => {
+              setShowAddLinkDialog(isOpen);
+              if (!isOpen) {
+                setLinkTitle('');
+              }
+            }}>
               <DialogTrigger asChild>
                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
                   <Plus className="h-3 w-3" />
@@ -354,11 +373,11 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
                 <form onSubmit={createLink} className="space-y-4">
                   <div>
                     <Label htmlFor="title">Title</Label>
-                    <Input id="title" name="title" placeholder="Enter link title" required />
+                    <Input id="title" name="title" placeholder="Enter link title" value={linkTitle} onChange={(e) => setLinkTitle(e.target.value)} />
                   </div>
                   <div>
                     <Label htmlFor="url">URL</Label>
-                    <Input id="url" name="url" type="url" placeholder="https://example.com" required />
+                    <Input id="url" name="url" type="url" placeholder="https://example.com" required onPaste={handleUrlPaste} />
                   </div>
                   <div>
                     <Label htmlFor="description">Description (optional)</Label>
@@ -502,6 +521,7 @@ function SortableFolderCard({ folder, onEdit, onDelete, onShare, searchQuery }: 
 export default function MainContent({ selectedBoard, searchQuery }: MainContentProps) {
   const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [showCreateFolderDialog, setShowCreateFolderDialog] = useState(false)
   const [editingFolder, setEditingFolder] = useState<Folder | null>(null)
   const [folderShareDialog, setFolderShareDialog] = useState<{ open: boolean; folder: Folder | null }>({ open: false, folder: null })
@@ -527,6 +547,7 @@ export default function MainContent({ selectedBoard, searchQuery }: MainContentP
     if (!selectedBoard) return
 
     setLoading(true)
+    setError(null)
     try {
       const { data, error } = await supabase
         .from('folders')
@@ -536,8 +557,9 @@ export default function MainContent({ selectedBoard, searchQuery }: MainContentP
 
       if (error) throw error
       setFolders(data || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching folders:', error)
+      setError(`API Error: ${error.message}`)
     } finally {
       setLoading(false)
     }
@@ -751,6 +773,14 @@ export default function MainContent({ selectedBoard, searchQuery }: MainContentP
                 </CardContent>
               </Card>
             ))}
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center text-red-500">
+              <h3 className="mt-2 text-sm font-medium">{error}</h3>
+              <p className="mt-1 text-sm">Please try again later.</p>
+              <Button className="mt-4" onClick={fetchFolders}>Retry</Button>
+            </div>
           </div>
         ) : folders.length > 0 ? (
           <DndContext
