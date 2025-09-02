@@ -97,7 +97,7 @@ export default function ResetPassword() {
     } else {
       setSuccess('Your password has been updated successfully! Redirecting to dashboard...');
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/');
       }, 3000);
     }
 
