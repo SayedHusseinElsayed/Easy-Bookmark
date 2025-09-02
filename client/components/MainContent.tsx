@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import {
   DropdownMenu,
@@ -18,19 +19,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { 
-  Plus, 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  Share, 
+import {
+  Plus,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Share,
   FolderPlus,
   ExternalLink,
-  Globe,
   GripVertical
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import ShareDialog from '@/components/ShareDialog'
+import { Favicon } from '@/components/Favicon'
 import {
   DndContext,
   DragEndEvent,
@@ -79,15 +80,6 @@ interface LinkItemPropsWithSearch extends LinkItemProps {
 }
 
 function LinkItem({ link, onEdit, onDelete, onShare, searchQuery }: LinkItemPropsWithSearch) {
-  const getFaviconUrl = (url: string) => {
-    try {
-      const domain = new URL(url).hostname
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=16`
-    } catch {
-      return null
-    }
-  }
-
   const isMatch = useMemo(() => {
     if (!searchQuery) return false
     const lowerCaseQuery = searchQuery.toLowerCase()
@@ -102,19 +94,7 @@ function LinkItem({ link, onEdit, onDelete, onShare, searchQuery }: LinkItemProp
     <div className={cn("group flex items-center p-3 border border-gray-200 rounded-lg bg-white hover:bg-blue-50 hover:border-blue-200 transition-all duration-200 cursor-pointer", isMatch && "ring-2 ring-blue-500")}>
       <div className="flex items-center flex-1 min-w-0">
         <div className="flex-shrink-0 mr-3">
-          {getFaviconUrl(link.url) ? (
-            <img
-              src={getFaviconUrl(link.url)}
-              alt=""
-              className="w-4 h-4"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none'
-                const nextElement = e.currentTarget.nextElementSibling as HTMLElement
-                if (nextElement) nextElement.style.display = 'block'
-              }}
-            />
-          ) : null}
-          <Globe className="w-4 h-4 text-gray-400" style={{ display: 'none' }} />
+          <Favicon url={link.url} />
         </div>
         
         <div className="flex-1 min-w-0">
@@ -369,6 +349,9 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Link</DialogTitle>
+                  <DialogDescription>
+                    Add a new link to this folder. You can paste the URL to automatically fetch the title.
+                  </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={createLink} className="space-y-4">
                   <div>
@@ -442,6 +425,9 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit Link</DialogTitle>
+              <DialogDescription>
+                Edit the details of your saved link.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={updateLink} className="space-y-4">
               <div>
@@ -714,6 +700,9 @@ export default function MainContent({ selectedBoard, searchQuery }: MainContentP
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Create New Folder</DialogTitle>
+                <DialogDescription>
+                  Create a new folder to organize your bookmarks.
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={createFolder} className="space-y-4">
                 <div>
@@ -835,6 +824,9 @@ export default function MainContent({ selectedBoard, searchQuery }: MainContentP
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Folder</DialogTitle>
+            <DialogDescription>
+              Edit the details of your saved folder.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={updateFolder} className="space-y-4">
             <div>
