@@ -117,6 +117,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       email,
       password,
       options: {
+        shouldCreateUser: false,
         emailRedirectTo: `${redirectBase}/auth/callback`,
         data: {
           username: email.split("@")[0],
@@ -124,10 +125,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         },
       },
     });
-
-    if (result.data?.user && !result.data.user.email_confirmed_at) {
-      console.log("User created; verification email sent.");
-    }
 
     return { error: result.error };
   };

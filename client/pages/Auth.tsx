@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, FolderKanban, Share2, Cloud, Github, KeyRound } from 'lucide-react';
+import { Loader2, FolderKanban, Share2, Cloud, KeyRound } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const AppInfoPanel = () => (
@@ -56,11 +56,18 @@ const FeatureItem = ({ icon, title, description }: { icon: React.ReactNode, titl
 );
 
 export default function Auth() {
-  const { signIn, signUp, resetPassword, signInWithGithub } = useAuth();
+  const { signIn, signUp, resetPassword } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [forgotPassword, setForgotPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState("signin");
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setError(null);
+    setSuccess(null);
+  };
 
   const handleAuthAction = async (action: (email: string, password?: string) => Promise<any>, e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -108,7 +115,7 @@ export default function Auth() {
     if (error) {
       setError(error.message);
     } else {
-      setSuccess(`Check your email (${email}) for a verification link! Don't forget to check your spam folder. The email may take a few minutes to arrive.`);
+      setSuccess(`New account created! An email has been sent to ${email}. Please check your inbox to confirm your account.`);
     }
     
     setLoading(false);
@@ -185,7 +192,7 @@ export default function Auth() {
           <h2 className="text-3xl font-bold tracking-tight text-gray-900">Get started</h2>
           <p className="mt-2 text-sm text-gray-600">Sign in to your account or create a new one.</p>
         </div>
-        <Tabs defaultValue="signin" className="w-full" onValueChange={() => { setError(null); setSuccess(null); }}>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -214,18 +221,6 @@ export default function Auth() {
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Sign In
-                    </Button>
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-                      </div>
-                    </div>
-                    <Button variant="outline" className="w-full" onClick={signInWithGithub}>
-                      <Github className="mr-2 h-4 w-4" />
-                      GitHub
                     </Button>
                     <Button type="button" variant="link" className="w-full text-sm font-normal" onClick={() => setForgotPassword(true)}>
                       Forgot your password?
