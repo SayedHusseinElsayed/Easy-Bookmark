@@ -48,7 +48,6 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { fetchTitle } from '@/lib/link-utils'
 
 interface MainContentProps {
   selectedBoard: Board | null
@@ -155,7 +154,6 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
   const [showAddLinkDialog, setShowAddLinkDialog] = useState(false)
   const [editingLink, setEditingLink] = useState<Link | null>(null)
   const [linkShareDialog, setLinkShareDialog] = useState<{ open: boolean; link: Link | null }>({ open: false, link: null })
-  const [linkTitle, setLinkTitle] = useState('');
 
   const isMatch = useMemo(() => {
     if (!searchQuery) return false
@@ -183,31 +181,19 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
     }
   }
 
-  const handleUrlPaste = async (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const pastedUrl = e.clipboardData.getData('text');
-    if (pastedUrl) {
-      const title = await fetchTitle(pastedUrl);
-      setLinkTitle(title);
-    }
-  };
-
   const createLink = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const url = formData.get('url') as string
     const description = formData.get('description') as string
-    let title = linkTitle;
-
-    if (!title) {
-      title = await fetchTitle(url)
-    }
+    const title = formData.get('title') as string
 
     try {
       const { data, error } = await supabase
         .from('links')
         .insert([
           {
-            title,
+            title: title || 'Untitled',
             url,
             description: description || null,
             folder_id: folder.id,
@@ -221,7 +207,6 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
       
       setLinks([...links, data])
       setShowAddLinkDialog(false)
-      setLinkTitle('')
     } catch (error) {
       console.error('Error creating link:', error)
     }
@@ -335,12 +320,7 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
               Add URLs
             </Button>
             
-            <Dialog open={showAddLinkDialog} onOpenChange={(isOpen) => {
-              setShowAddLinkDialog(isOpen);
-              if (!isOpen) {
-                setLinkTitle('');
-              }
-            }}>
+            <Dialog open={showAddLinkDialog} onOpenChange={setShowAddLinkDialog}>
               <DialogTrigger asChild>
                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
                   <Plus className="h-3 w-3" />
@@ -355,12 +335,12 @@ function FolderCard({ folder, onEdit, onDelete, onShare, attributes, listeners, 
                 </DialogHeader>
                 <form onSubmit={createLink} className="space-y-4">
                   <div>
-                    <Label htmlFor="title">Title</Label>
-                    <Input id="title" name="title" placeholder="Enter link title" value={linkTitle} onChange={(e) => setLinkTitle(e.target.value)} />
+                    <Label htmlFor="title">Title (optional)</Label>
+                    <Input id="title" name="title" placeholder="Enter link title" />
                   </div>
                   <div>
                     <Label htmlFor="url">URL</Label>
-                    <Input id="url" name="url" type="url" placeholder="https://example.com" required onPaste={handleUrlPaste} />
+                    <Input id="url" name="url" type="url" placeholder="https://example.com" required />
                   </div>
                   <div>
                     <Label htmlFor="description">Description (optional)</Label>
