@@ -15,6 +15,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 
+import { SupportButton } from '@/components/SupportButton';
+
 export default function Dashboard(): JSX.Element {
   const { boardSlug } = useParams<{ boardSlug: string }>();
   const { user, session, signOut } = useAuth();
@@ -165,6 +167,7 @@ export default function Dashboard(): JSX.Element {
 
         <MainContent selectedBoard={selectedBoard} searchQuery={searchQuery} />
       </div>
+      <SupportButton />
     </div>
   );
 }
